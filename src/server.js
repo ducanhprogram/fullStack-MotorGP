@@ -1,26 +1,29 @@
 const { Template } = require("ejs");
 const express = require("express"); // commnjs
-const path = require("path");
 require("dotenv").config();
+const configViewEngine = require("./config/viewEngine");
+const webRouters = require("./routes/web");
+const connection = require("./config/database");
 
 // import express from 'express';
 const app = express(); // app express
 const port = process.env.PORT || 8888; // port
 
 const hostname = process.env.HOST_NAME;
-//  config template engine
-app.set("views", path.join(__dirname, "views")); //views: lưu trữ template engine
-app.set("view engine", "ejs");
 
-//Khai báo route  :: Để server để biết được có những router nào
-app.get("/", (req, res) => {
-    res.send("Hello World fullStack! & Nodemon");
-});
+//config req.body
+app.use(express.json()); // Used to parse JSON bodies
+app.use(express.urlencoded()); //Parse URL-encoded bodies
 
-app.get("/daihoccn", (req, res) => {
-    // res.send("<h1>Nhom Do An CN4</h1>");
-    res.render("sample.ejs"); //views động   ==> render
-});
+// config template engine
+configViewEngine(app);
+
+app.use("/", webRouters);
+
+// // simple query
+// connection.query("SELECT * FROM Users", function (err, results, fields) {
+//     console.log(">>>results= ", results); // results contains rows returned by server
+// });
 
 app.listen(port, hostname, () => {
     console.log(`Example app listening on port ${port}`);
